@@ -8,7 +8,9 @@ import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -21,24 +23,16 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onDirectoryCreate(File directory) {
-        File file = new File(Config.nativeHexoPath+Constant.cachePath+ directory.getAbsolutePath().replace(FilePath,""));
+        File file = new File(directory.getAbsolutePath().replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
         boolean aFolder = NetToolApi.createAFolder(directory.getAbsolutePath().replace(FilePath, ""));
         if(!file.exists()){
-            boolean mkdirs = file.mkdirs();
-            if(!mkdirs){
-                throw new RuntimeException("创建文件夹失败");
-            }
+            file.mkdirs();
         }
     }
 
     @Override
-    public void onDirectoryChange(File directory) {
-        System.out.println("修改文件夹：" + directory.getAbsolutePath());
-    }
-
-    @Override
     public void onDirectoryDelete(File directory) {
-        File file = new File(Config.nativeHexoPath+Constant.cachePath+ directory.getAbsolutePath().replace(FilePath,""));
+        File file = new File(directory.getAbsolutePath().replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
         boolean aFolder = NetToolApi.deleteAFolder(directory.getAbsolutePath().replace(FilePath, ""));
         if(file.exists()){
             boolean delete = file.delete();
@@ -52,8 +46,12 @@ public class FileListener extends FileAlterationListenerAdaptor {
     public void onFileCreate(File file) {
         String compressedPath = file.getAbsolutePath();
         try {
-            NetToolApi.createAFile(compressedPath.replace(FilePath, ""), Files.readAllLines(file.toPath()));
-            Files.copy(file.toPath(), new File(Config.nativeHexoPath+Constant.cachePath+compressedPath.replace(FilePath,"")).toPath());
+            NetToolApi.createAFile(compressedPath.replace(FilePath+"\\", "//"), Files.readAllLines(file.toPath()));
+            File cacheFile = new File(compressedPath.replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
+            cacheFile.createNewFile();
+            try (FileOutputStream fileOutputStream = new FileOutputStream(cacheFile)) {
+                fileOutputStream.write(Files.readAllBytes(file.toPath()));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -62,7 +60,7 @@ public class FileListener extends FileAlterationListenerAdaptor {
     @Override
     public void onFileChange(File blogFile) {
         String compressedPath = blogFile.getAbsolutePath();
-        File sourceFile = new File(Config.nativeHexoPath+Constant.cachePath+compressedPath.replace(FilePath,""));
+        File sourceFile = new File(compressedPath.replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
         //原始文件
         if(sourceFile.exists()){
             List<String> compare = PatchTool.compare(blogFile.toPath(), sourceFile.toPath());
@@ -84,7 +82,7 @@ public class FileListener extends FileAlterationListenerAdaptor {
     public void onFileDelete(File file) {
         boolean b = NetToolApi.deleteAFile(file.getAbsolutePath());
         if(b){
-            new File(Config.nativeHexoPath+Constant.cachePath+file.getAbsolutePath().replace(FilePath,"")).delete();
+            new File(file.getAbsolutePath().replace(FilePath,"")).delete();
         }
     }
 

@@ -38,8 +38,20 @@ public class NetToolApi {
         return true;
     }
     public static boolean createAFile(String path, List<String> content){
-        HandlerMapper.handlerMap.get(HandlerEnum.ADD_FILE.getId()).handle(path.getBytes());
-        return true;
+        StringBuilder sb = new StringBuilder();
+        sb.append(path);
+        sb.append("\n");
+        for (String s : content) {
+            sb.append(s);
+            sb.append("\n");
+        }
+        try {
+            NetToolApi.sendMeta(HandlerEnum.ADD_FILE.getId(),sb.toString().getBytes().length);
+            Connector.socketChannel.write(ByteBuffer.wrap(sb.toString().getBytes()));
+            return true;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     public static boolean createAFolder(String path){
         HandlerMapper.handlerMap.get(HandlerEnum.ADD_DIR.getId()).handle(path.getBytes());

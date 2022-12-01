@@ -2,8 +2,6 @@ package live.midreamsheep.hexo.client.monitor;
 
 import live.midreamsheep.hexo.client.config.Config;
 import live.midreamsheep.hexo.client.data.Constant;
-import live.midreamsheep.hexo.client.hand.HandlerEnum;
-import live.midreamsheep.hexo.client.hand.HandlerMapper;
 import live.midreamsheep.hexo.client.net.NetToolApi;
 import live.midreamsheep.hexo.client.tool.patch.PatchTool;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
@@ -23,7 +21,14 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onDirectoryCreate(File directory) {
-        HandlerMapper.handlerMap.get(HandlerEnum.ADD_DIR.getId()).handle(directory.getAbsolutePath().replace(FilePath, "").getBytes());
+        File file = new File(Config.nativeHexoPath+Constant.cachePath+ directory.getAbsolutePath().replace(FilePath,""));
+        boolean aFolder = NetToolApi.createAFolder(directory.getAbsolutePath().replace(FilePath, ""));
+        if(!file.exists()){
+            boolean mkdirs = file.mkdirs();
+            if(!mkdirs){
+                throw new RuntimeException("创建文件夹失败");
+            }
+        }
     }
 
     @Override
@@ -33,14 +38,21 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onDirectoryDelete(File directory) {
-        System.out.println("删除文件夹：" + directory.getAbsolutePath());
+        File file = new File(Config.nativeHexoPath+Constant.cachePath+ directory.getAbsolutePath().replace(FilePath,""));
+        boolean aFolder = NetToolApi.deleteAFolder(directory.getAbsolutePath().replace(FilePath, ""));
+        if(file.exists()){
+            boolean delete = file.delete();
+            if(!delete){
+                throw new RuntimeException("删除文件夹失败");
+            }
+        }
     }
 
     @Override
     public void onFileCreate(File file) {
         String compressedPath = file.getAbsolutePath();
-        System.out.println("新建文件：" + compressedPath);
         try {
+            NetToolApi.createAFile(compressedPath.replace(FilePath, ""), Files.readAllLines(file.toPath()));
             Files.copy(file.toPath(), new File(Config.nativeHexoPath+Constant.cachePath+compressedPath.replace(FilePath,"")).toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -56,13 +68,14 @@ public class FileListener extends FileAlterationListenerAdaptor {
             List<String> compare = PatchTool.compare(blogFile.toPath(), sourceFile.toPath());
             //获取了差异文件
             if(compare.size()>0){
-
-            }
-            //复制到缓存文件夹
-            try {
-                Files.copy(blogFile.toPath(),sourceFile.toPath(),java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
+                //上传文件
+                boolean b = NetToolApi.updateAFile(compressedPath.replace(FilePath, ""), compare);
+                //更新缓存文件
+                try {
+                    Files.copy(blogFile.toPath(),sourceFile.toPath(),java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

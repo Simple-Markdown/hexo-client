@@ -8,15 +8,14 @@ import live.midreamsheep.hexo.client.net.NetToolApi;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class AddDir implements HandlerInter {
+public class DeleteFile implements HandlerInter {
     @Override
     public void handle(byte[] data) {
         try {
-            NetToolApi.sendMeta(HandlerEnum.ADD_DIR.getId(),data.length);
+            NetToolApi.sendMeta(HandlerEnum.DELETE_FILE.getId(),data.length);
             Connector.socketChannel.write(ByteBuffer.wrap(data));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

@@ -2,6 +2,7 @@ package live.midreamsheep.hexo.client.monitor;
 
 import live.midreamsheep.hexo.client.config.Config;
 import live.midreamsheep.hexo.client.data.Constant;
+import live.midreamsheep.hexo.client.data.TextPostfix;
 import live.midreamsheep.hexo.client.net.NetToolApi;
 import live.midreamsheep.hexo.client.tool.patch.PatchTool;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
@@ -12,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 public class FileListener extends FileAlterationListenerAdaptor {
@@ -36,8 +38,8 @@ public class FileListener extends FileAlterationListenerAdaptor {
         boolean aFolder = NetToolApi.deleteAFolder(directory.getAbsolutePath().replace(FilePath, ""));
         if(file.exists()){
             boolean delete = file.delete();
-            if(!delete){
-                throw new RuntimeException("删除文件夹失败");
+            while (!delete){
+                delete = file.delete();
             }
         }
     }
@@ -46,12 +48,10 @@ public class FileListener extends FileAlterationListenerAdaptor {
     public void onFileCreate(File file) {
         String compressedPath = file.getAbsolutePath();
         try {
-            NetToolApi.createAFile(compressedPath.replace(FilePath+"\\", "//"), Files.readAllLines(file.toPath()));
+            NetToolApi.createAFile(compressedPath.replace(FilePath,""), Files.readAllBytes(file.toPath()));
             File cacheFile = new File(compressedPath.replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
             cacheFile.createNewFile();
-            try (FileOutputStream fileOutputStream = new FileOutputStream(cacheFile)) {
-                fileOutputStream.write(Files.readAllBytes(file.toPath()));
-            }
+            Files.copy(file.toPath(),cacheFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -63,24 +63,33 @@ public class FileListener extends FileAlterationListenerAdaptor {
         File sourceFile = new File(compressedPath.replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
         //原始文件
         if(sourceFile.exists()){
-            List<String> compare = PatchTool.compare(blogFile.toPath(), sourceFile.toPath());
-            //获取了差异文件
-            if(compare.size()>0){
-                //上传文件
-                boolean b = NetToolApi.updateAFile(compressedPath.replace(FilePath, ""), compare);
-                //更新缓存文件
+            if(TextPostfix.set.contains(compressedPath.substring(compressedPath.lastIndexOf(".")))) {
+                List<String> compare = PatchTool.compare(blogFile.toPath(), sourceFile.toPath());
+                //获取了差异文件
+                if (compare.size() > 0) {
+                    //上传文件
+                    boolean b = NetToolApi.updateAFile(compressedPath.replace(FilePath, ""), compare);
+                    //更新缓存文件
+                }
+            }else {
                 try {
-                    Files.copy(blogFile.toPath(),sourceFile.toPath(),java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    NetToolApi.deleteAFile(compressedPath.replace(FilePath, ""));
+                    NetToolApi.createAFile(compressedPath.replace(FilePath, ""), Files.readAllBytes(blogFile.toPath()));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
+            try {
+                Files.copy(blogFile.toPath(),sourceFile.toPath(),java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
     @Override
     public void onFileDelete(File file) {
-        boolean b = NetToolApi.deleteAFile(file.getAbsolutePath());
+        boolean b = NetToolApi.deleteAFile(file.getAbsolutePath().replace(FilePath, ""));
         if(b){
             new File(file.getAbsolutePath().replace(FilePath,"")).delete();
         }

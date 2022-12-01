@@ -37,21 +37,14 @@ public class NetToolApi {
         HandlerMapper.handlerMap.get(HandlerEnum.DELETE_FILE.getId()).handle(path.getBytes());
         return true;
     }
-    public static boolean createAFile(String path, List<String> content){
-        StringBuilder sb = new StringBuilder();
-        sb.append(path);
-        sb.append("\n");
-        for (String s : content) {
-            sb.append(s);
-            sb.append("\n");
-        }
-        try {
-            NetToolApi.sendMeta(HandlerEnum.ADD_FILE.getId(),sb.toString().getBytes().length);
-            Connector.socketChannel.write(ByteBuffer.wrap(sb.toString().getBytes()));
-            return true;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static boolean createAFile(String path, byte[] content){
+        String sb = path + "\n";
+        byte[] pathBytes = sb.getBytes();
+        byte[] bytes = new byte[pathBytes.length + content.length];
+        System.arraycopy(pathBytes,0,bytes,0,pathBytes.length);
+        System.arraycopy(content,0,bytes,pathBytes.length,content.length);
+        HandlerMapper.handlerMap.get(HandlerEnum.ADD_FILE.getId()).handle(bytes);
+        return true;
     }
     public static boolean createAFolder(String path){
         HandlerMapper.handlerMap.get(HandlerEnum.ADD_DIR.getId()).handle(path.getBytes());

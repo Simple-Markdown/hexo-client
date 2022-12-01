@@ -2,6 +2,8 @@ package live.midreamsheep.hexo.client.monitor;
 
 import live.midreamsheep.hexo.client.config.Config;
 import live.midreamsheep.hexo.client.data.Constant;
+import live.midreamsheep.hexo.client.hand.HandlerEnum;
+import live.midreamsheep.hexo.client.hand.HandlerMapper;
 import live.midreamsheep.hexo.client.net.NetToolApi;
 import live.midreamsheep.hexo.client.tool.patch.PatchTool;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
@@ -21,7 +23,7 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onDirectoryCreate(File directory) {
-        System.out.println("创建文件夹：" + directory.getAbsolutePath());
+        HandlerMapper.handlerMap.get(HandlerEnum.ADD_DIR.getId()).handle(directory.getAbsolutePath().replace(FilePath, "").getBytes());
     }
 
     @Override
@@ -54,8 +56,7 @@ public class FileListener extends FileAlterationListenerAdaptor {
             List<String> compare = PatchTool.compare(blogFile.toPath(), sourceFile.toPath());
             //获取了差异文件
             if(compare.size()>0){
-                System.out.println("文件变更，进行处理");
-                // TODO 读取或重新加载文件内容
+
             }
             //复制到缓存文件夹
             try {

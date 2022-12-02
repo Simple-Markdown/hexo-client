@@ -48,6 +48,7 @@ public class HexoClientStarter {
         thread.setDaemon(true);
         thread.start();
         //命令注入
+        CommandStarter.start();
         //命令行启动
         ApplicationStarter.main(args);
     }

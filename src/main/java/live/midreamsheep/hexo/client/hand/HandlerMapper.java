@@ -13,5 +13,7 @@ public class HandlerMapper {
         handlerMap.put(HandlerEnum.DELETE_DIR.getId(),new DeleteDir());
         handlerMap.put(HandlerEnum.DELETE_FILE.getId(),new DeleteFile());
         handlerMap.put(HandlerEnum.UPDATE_FILE.getId(),new UpdateAFile());
+        handlerMap.put(HandlerEnum.PUSH.getId(),new Push());
+        handlerMap.put(HandlerEnum.PULL.getId(),new Pull());
     }
 }

@@ -17,7 +17,6 @@ public class NetToolApi {
         bytes[2] = (byte) (length >> 16);
         bytes[3] = (byte) (length >> 8);
         bytes[4] = (byte) (length);
-        System.out.println(length);
         Connector.socketChannel.write(ByteBuffer.wrap(bytes));
     }
     public static boolean updateAFile(String path, List<String> patch){

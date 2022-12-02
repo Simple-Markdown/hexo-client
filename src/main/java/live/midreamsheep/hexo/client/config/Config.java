@@ -14,6 +14,8 @@ public class Config {
     //服务器通行密码
     public static String password;
 
+    public static volatile boolean isPulling = false;
+
     public static void setConfig(String config){
         for (String s : config.split("\n")) {
             if(s.trim().startsWith("#")){

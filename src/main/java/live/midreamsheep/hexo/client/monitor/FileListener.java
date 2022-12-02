@@ -9,9 +9,7 @@ import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
@@ -25,6 +23,10 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onDirectoryCreate(File directory) {
+        if(Config.isPulling){
+            System.out.println("正在拉取，不进行操作");
+            return;
+        }
         File file = new File(directory.getAbsolutePath().replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
         boolean aFolder = NetToolApi.createAFolder(directory.getAbsolutePath().replace(FilePath, ""));
         if(!file.exists()){
@@ -34,6 +36,9 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onDirectoryDelete(File directory) {
+        if(Config.isPulling){
+            return;
+        }
         File file = new File(directory.getAbsolutePath().replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
         boolean aFolder = NetToolApi.deleteAFolder(directory.getAbsolutePath().replace(FilePath, ""));
         if(file.exists()){
@@ -46,6 +51,10 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onFileCreate(File file) {
+        if(Config.isPulling){
+            System.out.println("正在拉取，不进行操作");
+            return;
+        }
         String compressedPath = file.getAbsolutePath();
         try {
             NetToolApi.createAFile(compressedPath.replace(FilePath,""), Files.readAllBytes(file.toPath()));
@@ -59,6 +68,10 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onFileChange(File blogFile) {
+        if(Config.isPulling){
+            System.out.println("正在拉取，不进行操作");
+            return;
+        }
         String compressedPath = blogFile.getAbsolutePath();
         File sourceFile = new File(compressedPath.replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
         //原始文件
@@ -89,6 +102,9 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onFileDelete(File file) {
+        if(Config.isPulling){
+            return;
+        }
         boolean b = NetToolApi.deleteAFile(file.getAbsolutePath().replace(FilePath, ""));
         if(b){
             new File(file.getAbsolutePath().replace(FilePath,"")).delete();

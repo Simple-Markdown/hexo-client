@@ -63,7 +63,7 @@ public class FileListener extends FileAlterationListenerAdaptor {
         File sourceFile = new File(compressedPath.replace(FilePath, Config.nativeHexoPath + Constant.cachePath));
         //原始文件
         if(sourceFile.exists()){
-            if(TextPostfix.set.contains(compressedPath.substring(compressedPath.lastIndexOf(".")))) {
+            if(TextPostfix.set.contains(compressedPath.substring(compressedPath.lastIndexOf(".")))&&sourceFile.length()>0) {
                 List<String> compare = PatchTool.compare(blogFile.toPath(), sourceFile.toPath());
                 //获取了差异文件
                 if (compare.size() > 0) {

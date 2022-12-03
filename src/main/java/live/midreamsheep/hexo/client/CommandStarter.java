@@ -6,11 +6,14 @@ import live.midreamsheep.hexo.client.hand.HandlerMapper;
 
 public class CommandStarter {
     public static void start(){
-        CommandManager.addController("push",(a) ->{
-            HandlerMapper.handlerMap.get(HandlerEnum.PUSH.getId()).handle(new byte[0]);
+        CommandManager.addController("dpush",(a) ->{
+            HandlerMapper.handlerMap.get(HandlerEnum.DPUSH.getId()).handle(new byte[0]);
         });
         CommandManager.addController("pull",(a) ->{
             HandlerMapper.handlerMap.get(HandlerEnum.PULL.getId()).handle(new byte[0]);
+        });
+        CommandManager.addController("push",(a)->{
+            HandlerMapper.handlerMap.get(HandlerEnum.PUSH.getId()).handle(new byte[0]);
         });
     }
 }

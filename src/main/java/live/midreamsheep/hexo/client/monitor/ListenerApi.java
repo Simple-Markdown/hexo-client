@@ -96,7 +96,7 @@ public class ListenerApi {
         }
         boolean b = NetToolApi.deleteAFile(file.getAbsolutePath().replace(FilePath, ""));
         if(b){
-            new File(file.getAbsolutePath().replace(FilePath,"")).delete();
+            new File(file.getAbsolutePath().replace(FilePath,Config.nativeHexoPath+File.separator+Constant.cachePath)).delete();
         }
     }
 

@@ -1,10 +1,6 @@
 package live.midreamsheep.hexo.client.monitor;
 
-import live.midreamsheep.hexo.client.config.Config;
-import live.midreamsheep.hexo.client.data.Constant;
-import live.midreamsheep.hexo.client.data.TextPostfix;
-import live.midreamsheep.hexo.client.net.NetToolApi;
-import live.midreamsheep.hexo.client.tool.patch.PatchTool;
+
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 

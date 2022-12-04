@@ -15,5 +15,11 @@ public class CommandStarter {
         CommandManager.addController("push",(a)->{
             HandlerMapper.handlerMap.get(HandlerEnum.PUSH.getId()).handle(new byte[0]);
         });
+        CommandManager.addController("server",(a)->{
+            HandlerMapper.handlerMap.get(HandlerEnum.SERVER.getId()).handle(new byte[0]);
+        });
+        CommandManager.addController("stop",(a)->{
+            HandlerMapper.handlerMap.get(HandlerEnum.SERVER_STOP.getId()).handle(new byte[0]);
+        });
     }
 }

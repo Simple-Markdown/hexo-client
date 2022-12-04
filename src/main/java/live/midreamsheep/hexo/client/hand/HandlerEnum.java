@@ -8,7 +8,9 @@ public enum HandlerEnum {
     UPDATE_FILE(0x05),
     ADD_DIR(0x06),
     DELETE_DIR(0x07),
-    PUSH(0x08);
+    PUSH(0x08),
+    SERVER(0x09),
+    SERVER_STOP(0x10);
     private final int id;
 
     HandlerEnum(int id) {

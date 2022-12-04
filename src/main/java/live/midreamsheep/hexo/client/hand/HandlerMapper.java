@@ -16,5 +16,7 @@ public class HandlerMapper {
         handlerMap.put(HandlerEnum.DPUSH.getId(),new DPush());
         handlerMap.put(HandlerEnum.PULL.getId(),new Pull());
         handlerMap.put(HandlerEnum.PUSH.getId(),new Push());
+        handlerMap.put(HandlerEnum.SERVER.getId(),new Server());
+        handlerMap.put(HandlerEnum.SERVER_STOP.getId(),new ServerStop());
     }
 }

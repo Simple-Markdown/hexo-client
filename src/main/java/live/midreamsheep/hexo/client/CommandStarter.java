@@ -1,8 +1,8 @@
 package live.midreamsheep.hexo.client;
 
 import live.midreamsheep.command.control.CommandManager;
-import live.midreamsheep.hexo.client.hand.HandlerEnum;
-import live.midreamsheep.hexo.client.hand.HandlerMapper;
+import live.midreamsheep.hexo.netapi.hand.HandlerEnum;
+import live.midreamsheep.hexo.netapi.hand.HandlerMapper;
 
 public class CommandStarter {
     public static void start(){

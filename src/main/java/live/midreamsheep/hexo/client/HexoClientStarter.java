@@ -26,26 +26,7 @@ public class HexoClientStarter {
         monitorStarter.monitor(new File(ConnectorConfig.nativeHexoPath+ Constant.blogPath).getPath(), new FileListener());
         monitorStarter.start();
         //开启守护线程监听任务
-        Thread thread = new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                while (!QueueApi.isEmpty()) {
-                    Task task = QueueApi.getTask();
-                    task.getHandler().handle(task.getDatas());
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
-        thread.setDaemon(true);
-        thread.start();
+        TaskQueueStarter.start();
         //命令注入
         CommandStarter.start();
         //命令行启动
